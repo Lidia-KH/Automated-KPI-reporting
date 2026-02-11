@@ -6,4 +6,5 @@ fastapi
 streamlit
 plotly
 pathlib
- 
+altair
+protobuf
