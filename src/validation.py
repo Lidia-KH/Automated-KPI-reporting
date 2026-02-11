@@ -1,6 +1,6 @@
 import pandas as pd
 
-required_fields = {"invoice", "quantity", "invoicedate", "customer_id"}
+required_fields = {"price", "quantity", "invoicedate", "customer_id"}
 
 def validate(df):
     for col in required_fields:
@@ -18,4 +18,9 @@ def validate(df):
 
     negative_quantity = (df["quantity"] < 0).sum()
     print(f"Number of negative quantity : {negative_quantity}")
+
+    df['total_price'] = df['price'] * df['quantity']
+    # df.drop(columns=['Price'])
+    df['invoicedate'] = pd.to_datetime(df['invoicedate'])
+
     return df

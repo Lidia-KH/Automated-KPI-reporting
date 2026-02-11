@@ -3,3 +3,7 @@ numpy
 matplotlib
 seaborn
 fastapi
+streamlit
+plotly
+pathlib
+ 
