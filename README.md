@@ -89,4 +89,5 @@ Matplotlib / Plotly
 
 # Installation (Local)
 pip install -r requirements.txt
+
 streamlit run app.py
