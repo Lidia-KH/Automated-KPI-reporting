@@ -6,11 +6,7 @@ import sys
 from io import BytesIO
 from PIL import Image
 
-# Add the project root to the path so we can import from src
-# Adjust this path based on where you place this file
-# sys.path.append(str(Path(__file__).parent))
 
-# Import your existing functions
 try:
     from src.ingestion import load_csv
     from src.validation import validate
