@@ -6,6 +6,34 @@ import sys
 from io import BytesIO
 from PIL import Image
 
+# Page configuration
+st.set_page_config(
+    page_title="KPI Revenue Dashboard",
+    page_icon="📊",
+    layout="wide"
+)
+
+def check_password():
+    if st.session_state.get("authenticated"):
+        return True
+    
+    st.title("📊 Automated KPI Revenue Dashboard")
+    st.markdown("Please Enter The Password To Access The App.")
+
+    pwd = st.text_input("Password", placeholder="Enter password ...", type="password")
+
+    if pwd:
+        if pwd == st.secrets["APP_PASSWORD"]:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Incorrect Password ! Please Try Again.")
+    return False
+
+if not check_password():
+    st.stop()
+        
+
 
 try:
     from src.ingestion import load_csv
@@ -18,12 +46,7 @@ except ImportError:
     FUNCTIONS_AVAILABLE = False
     st.warning("Could not import project functions. Make sure this file is in the project root.")
 
-# Page configuration
-st.set_page_config(
-    page_title="KPI Revenue Dashboard",
-    page_icon="📊",
-    layout="wide"
-)
+
 
 # Title and description
 st.title("📊 Automated KPI Revenue Dashboard")
