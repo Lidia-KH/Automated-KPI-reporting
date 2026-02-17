@@ -156,129 +156,129 @@ if uploaded_file is not None and FUNCTIONS_AVAILABLE:
                         st.success(f"✅ Revenue calculated by {aggregation}")
                         st.dataframe(df_revenue, use_container_width=True)
         
-        # Clean up temp file
-        if temp_path.exists():
-            temp_path.unlink()
-        
-        # Display metrics
-        st.divider()
-        st.subheader("📊 Key Metrics")
-        
-        col1, col2, col3, col4 = st.columns(4)
-        
-        # Assuming df_revenue has a 'Revenue' or similar column
-        revenue_col = None
-        for col in df_revenue.columns:
-            if 'revenue' in col.lower():
-                revenue_col = col
-                break
-        
-        if revenue_col:
-            with col1:
-                total_revenue = df_revenue[revenue_col].sum()
-                st.metric("Total Revenue", f"${total_revenue:,.2f}")
-            
-            with col2:
-                avg_revenue = df_revenue[revenue_col].mean()
-                st.metric(f"Avg Revenue", f"${avg_revenue:,.2f}")
-            
-            with col3:
-                max_revenue = df_revenue[revenue_col].max()
-                st.metric("Peak Revenue", f"${max_revenue:,.2f}")
-            
-            with col4:
-                num_periods = len(df_revenue)
-                st.metric(f"Total Periods", num_periods)
-        
-        st.divider()
-        
-        # Create two columns for report and plot
-        col_report, col_plot = st.columns([1, 2])
-        
-        with col_report:
-            st.subheader("📋 Revenue Report")
-            
-            # Display the revenue dataframe
-            st.dataframe(
-                df_revenue,
-                use_container_width=True,
-                height=400
-            )
-            
-            # Export CSV button
-            csv_buffer = BytesIO()
-            df_revenue.to_csv(csv_buffer, index=True)
-            csv_buffer.seek(0)
-            
-            st.download_button(
-                label="📥 Download Report as CSV",
-                data=csv_buffer,
-                file_name=f"revenue_report_{aggregation}.csv",
-                mime="text/csv"
-            )
-        
-        with col_plot:
-            st.subheader("📈 Revenue Trend")
-            
-            # Generate plot using your existing function
-            plot_path = Path("outputs/temp_plot.png")
-            plot_path.parent.mkdir(exist_ok=True)
-            
-            # Update TIME_GRAIN temporarily for plotting
-            import src.config as config
-            original_grain = config.TIME_GRAIN
-            config.TIME_GRAIN = aggregation
-            
-            plot_revenue(df_revenue, str(plot_path))
-            
-            config.TIME_GRAIN = original_grain
-            
-            # Display the plot
-            if plot_path.exists():
-                image = Image.open(plot_path)
-                st.image(image, use_container_width=True)
-                
-                # Offer download
-                with open(plot_path, "rb") as file:
-                    st.download_button(
-                        label="📥 Download Plot",
-                        data=file,
-                        file_name=f"revenue_plot_{aggregation}.png",
-                        mime="image/png"
-                    )
-                
-                # Clean up
-                plot_path.unlink()
-        
-        # Additional insights
-        st.divider()
-        st.subheader("📊 Additional Insights")
-        
-        if revenue_col:
-            insight_col1, insight_col2, insight_col3 = st.columns(3)
-            
-            with insight_col1:
-                # Growth calculation
-                if len(df_revenue) > 1:
-                    first_revenue = df_revenue[revenue_col].iloc[0]
-                    last_revenue = df_revenue[revenue_col].iloc[-1]
-                    if abs(first_revenue) > 1e-6:
-                        growth = ((last_revenue - first_revenue) / abs(first_revenue)) * 100
-                    else:
-                        growth = 0
-                    st.metric("Overall Growth", f"{growth:+.2f}%")
-                else:
-                    st.metric("Overall Growth", "N/A")
-            
-            with insight_col2:
-                min_revenue = df_revenue[revenue_col].min()
-                st.metric("Lowest Revenue", f"${min_revenue:,.2f}")
-            
-            with insight_col3:
-                median_revenue = df_revenue[revenue_col].median()
-                st.metric("Median Revenue", f"${median_revenue:,.2f}")
-        
-        st.success("✅ Report generated successfully!")
+                    # Clean up temp file
+                    if temp_path.exists():
+                        temp_path.unlink()
+                    
+                    # Display metrics
+                    st.divider()
+                    st.subheader("📊 Key Metrics")
+                    
+                    col1, col2, col3, col4 = st.columns(4)
+                    
+                    # Assuming df_revenue has a 'Revenue' or similar column
+                    revenue_col = None
+                    for col in df_revenue.columns:
+                        if 'revenue' in col.lower():
+                            revenue_col = col
+                            break
+                    
+                    if revenue_col:
+                        with col1:
+                            total_revenue = df_revenue[revenue_col].sum()
+                            st.metric("Total Revenue", f"${total_revenue:,.2f}")
+                        
+                        with col2:
+                            avg_revenue = df_revenue[revenue_col].mean()
+                            st.metric(f"Avg Revenue", f"${avg_revenue:,.2f}")
+                        
+                        with col3:
+                            max_revenue = df_revenue[revenue_col].max()
+                            st.metric("Peak Revenue", f"${max_revenue:,.2f}")
+                        
+                        with col4:
+                            num_periods = len(df_revenue)
+                            st.metric(f"Total Periods", num_periods)
+                    
+                    st.divider()
+                    
+                    # Create two columns for report and plot
+                    col_report, col_plot = st.columns([1, 2])
+                    
+                    with col_report:
+                        st.subheader("📋 Revenue Report")
+                        
+                        # Display the revenue dataframe
+                        st.dataframe(
+                            df_revenue,
+                            use_container_width=True,
+                            height=400
+                        )
+                        
+                        # Export CSV button
+                        csv_buffer = BytesIO()
+                        df_revenue.to_csv(csv_buffer, index=True)
+                        csv_buffer.seek(0)
+                        
+                        st.download_button(
+                            label="📥 Download Report as CSV",
+                            data=csv_buffer,
+                            file_name=f"revenue_report_{aggregation}.csv",
+                            mime="text/csv"
+                        )
+                    
+                    with col_plot:
+                        st.subheader("📈 Revenue Trend")
+                        
+                        # Generate plot using your existing function
+                        plot_path = Path("outputs/temp_plot.png")
+                        plot_path.parent.mkdir(exist_ok=True)
+                        
+                        # Update TIME_GRAIN temporarily for plotting
+                        import src.config as config
+                        original_grain = config.TIME_GRAIN
+                        config.TIME_GRAIN = aggregation
+                        
+                        plot_revenue(df_revenue, str(plot_path))
+                        
+                        config.TIME_GRAIN = original_grain
+                        
+                        # Display the plot
+                        if plot_path.exists():
+                            image = Image.open(plot_path)
+                            st.image(image, use_container_width=True)
+                            
+                            # Offer download
+                            with open(plot_path, "rb") as file:
+                                st.download_button(
+                                    label="📥 Download Plot",
+                                    data=file,
+                                    file_name=f"revenue_plot_{aggregation}.png",
+                                    mime="image/png"
+                                )
+                            
+                            # Clean up
+                            plot_path.unlink()
+                    
+                    # Additional insights
+                    st.divider()
+                    st.subheader("📊 Additional Insights")
+                    
+                    if revenue_col:
+                        insight_col1, insight_col2, insight_col3 = st.columns(3)
+                        
+                        with insight_col1:
+                            # Growth calculation
+                            if len(df_revenue) > 1:
+                                first_revenue = df_revenue[revenue_col].iloc[0]
+                                last_revenue = df_revenue[revenue_col].iloc[-1]
+                                if abs(first_revenue) > 1e-6:
+                                    growth = ((last_revenue - first_revenue) / abs(first_revenue)) * 100
+                                else:
+                                    growth = 0
+                                st.metric("Overall Growth", f"{growth:+.2f}%")
+                            else:
+                                st.metric("Overall Growth", "N/A")
+                        
+                        with insight_col2:
+                            min_revenue = df_revenue[revenue_col].min()
+                            st.metric("Lowest Revenue", f"${min_revenue:,.2f}")
+                        
+                        with insight_col3:
+                            median_revenue = df_revenue[revenue_col].median()
+                            st.metric("Median Revenue", f"${median_revenue:,.2f}")
+                    
+                    st.success("✅ Report generated successfully!")
         
     except Exception as e:
         st.error(f"❌ Error processing file: {str(e)}")
