@@ -84,16 +84,21 @@ with st.sidebar:
 # Main content
 if uploaded_file is not None and FUNCTIONS_AVAILABLE:
     try:
+        
         # Save uploaded file temporarily
         temp_path = Path("temp_upload.csv")
         with open(temp_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
+
+        # store raw df in session_state
+        if "raw_df" not in st.session_state:
+            st.session_state.raw_df = load_csv(temp_path)
         
         # Show processing steps
         with st.spinner("Processing data..."):
             # Step 1: Load CSV
             with st.expander("📥 Step 1: Loading CSV", expanded=False):
-                df = load_csv(str(temp_path))
+                df = st.session_state.raw_df
                 st.divider()
                 st.subheader("Column Mapping")
 
@@ -108,44 +113,48 @@ if uploaded_file is not None and FUNCTIONS_AVAILABLE:
 
                 if revenue_mode == "Use existing revenue column":
                     revenue_col = st.selectbox("Select Revenue Column", columns)
-                    df["__revenue__"] = df[revenue_col]
+                    
 
                 else:
                     qty = st.selectbox("Select Quantity Column", columns)
                     up = st.selectbox("Select Unit Price Column", columns)
-                    df["__revenue__"] = df[qty] * df[up]
+                    
 
                 # df["__date__"] = pd.to_datetime(df[date_col])
+                if st.button("Generate Report"):
+                    if revenue_mode == "Use existing revenue column":
+                        df["__revenue__"] = df[revenue_col]
+                    else:
+                        df["__revenue__"] = df[qty] * df[up]
 
+                    df = df.rename(columns={
+                        "__date__": "invoicedate",
+                        "__revenue__": "revenue"
+                    })
 
-                df = df.rename(columns={
-                    "__date__": "invoicedate",
-                    "__revenue__": "revenue"
-                })
-
-                st.success(f"✅ Loaded {len(df)} rows")
-                st.dataframe(df.head(), use_container_width=True)
+                    st.success(f"✅ Loaded {len(df)} rows")
+                    st.dataframe(df.head(), use_container_width=True)
             
-            # Step 2: Validate
-            with st.expander("✔️ Step 2: Validating Data", expanded=False):
-                df = validate(df)
-                st.success(f"✅ Validation complete: {len(df)} valid rows")
-                st.dataframe(df.head(), use_container_width=True)
-            
-            # Step 3: Calculate Revenue (using selected TIME_GRAIN)
-            with st.expander("💰 Step 3: Calculating Revenue", expanded=False):
-                # Temporarily update the TIME_GRAIN config
-                import src.config as config
-                original_grain = config.TIME_GRAIN
-                config.TIME_GRAIN = aggregation
-                
-                df_revenue = calculate_revenue(df)
-                
-                # Restore original grain
-                config.TIME_GRAIN = original_grain
-                
-                st.success(f"✅ Revenue calculated by {aggregation}")
-                st.dataframe(df_revenue, use_container_width=True)
+                    # Step 2: Validate
+                    with st.expander("✔️ Step 2: Validating Data", expanded=False):
+                        df = validate(df)
+                        st.success(f"✅ Validation complete: {len(df)} valid rows")
+                        st.dataframe(df.head(), use_container_width=True)
+                    
+                    # Step 3: Calculate Revenue (using selected TIME_GRAIN)
+                    with st.expander("💰 Step 3: Calculating Revenue", expanded=False):
+                        # Temporarily update the TIME_GRAIN config
+                        import src.config as config
+                        original_grain = config.TIME_GRAIN
+                        config.TIME_GRAIN = aggregation
+                        
+                        df_revenue = calculate_revenue(df)
+                        
+                        # Restore original grain
+                        config.TIME_GRAIN = original_grain
+                        
+                        st.success(f"✅ Revenue calculated by {aggregation}")
+                        st.dataframe(df_revenue, use_container_width=True)
         
         # Clean up temp file
         if temp_path.exists():
@@ -289,6 +298,6 @@ elif not FUNCTIONS_AVAILABLE:
     
 else:
     # Show instructions when no file is uploaded
-    st.info("👆 Please upload a CSV file to get started")
+    st.info("Please upload a CSV file to get started")
     
     st.markdown("### Project Structure Expected:")
