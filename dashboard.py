@@ -94,6 +94,35 @@ if uploaded_file is not None and FUNCTIONS_AVAILABLE:
             # Step 1: Load CSV
             with st.expander("📥 Step 1: Loading CSV", expanded=False):
                 df = load_csv(str(temp_path))
+                st.divider()
+                st.subheader("Column Mapping")
+
+                columns = df.columns.tolist()
+
+                date_col = st.selectbox("Select Date Column", columns)
+
+                revenue_mode = st.radio(
+                    "Revenue Source",
+                    ["Use existing revenue column", "Calculate revenue (Quantity x Unit Price)"]
+                )
+
+                if revenue_mode == "Use existing revenue column":
+                    revenue_col = st.selectbox("Select Revenue Column", columns)
+                    df["__revenue__"] = df[revenue_col]
+
+                else:
+                    qty = st.selectbox("Select Quantity Column", columns)
+                    up = st.selectbox("Select Unit Price Column", columns)
+                    df["__revenue__"] = df[qty] * df[up]
+
+                df["__date__"] = pd.to_datetime(df[date_col])
+
+
+                df = df.rename(columns={
+                    "__date__": "invoicedate",
+                    "__revenue__": "revenue"
+                })
+
                 st.success(f"✅ Loaded {len(df)} rows")
                 st.dataframe(df.head(), use_container_width=True)
             
@@ -224,7 +253,10 @@ if uploaded_file is not None and FUNCTIONS_AVAILABLE:
                 if len(df_revenue) > 1:
                     first_revenue = df_revenue[revenue_col].iloc[0]
                     last_revenue = df_revenue[revenue_col].iloc[-1]
-                    growth = ((last_revenue - first_revenue) / first_revenue) * 100 if first_revenue != 0 else 0
+                    if abs(first_revenue) > 1e-6:
+                        growth = ((last_revenue - first_revenue) / abs(first_revenue)) * 100
+                    else:
+                        growth = 0
                     st.metric("Overall Growth", f"{growth:+.2f}%")
                 else:
                     st.metric("Overall Growth", "N/A")

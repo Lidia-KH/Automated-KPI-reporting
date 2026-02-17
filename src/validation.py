@@ -1,6 +1,6 @@
 import pandas as pd
 
-required_fields = {"price", "quantity", "invoicedate", "customer_id"}
+required_fields = {"revenue", "invoicedate"}
 
 def validate(df):
     for col in required_fields:
@@ -16,10 +16,10 @@ def validate(df):
     df.drop_duplicates(inplace=True)
     print(f"The number of rows duplicated to be dropped is : {duplicates}")
 
-    negative_quantity = (df["quantity"] < 0).sum()
-    print(f"Number of negative quantity : {negative_quantity}")
+    # negative_quantity = (df["quantity"] < 0).sum()
+    # print(f"Number of negative quantity : {negative_quantity}")
 
-    df['total_price'] = df['price'] * df['quantity']
+    # df['total_price'] = df['price'] * df['quantity']
     # df.drop(columns=['Price'])
     df['invoicedate'] = pd.to_datetime(df['invoicedate'])
 

@@ -11,9 +11,8 @@ def calculate_revenue(df):
     df_revenue = (
         df_copy
         .set_index('invoicedate')
-        .resample(TIME_GRAIN)['price']
+        .resample(TIME_GRAIN)['revenue']
         .sum()
         .reset_index()
-        .rename(columns={'price':'revenue'})
     )
     return df_revenue
