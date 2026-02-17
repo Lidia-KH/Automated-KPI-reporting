@@ -115,7 +115,7 @@ if uploaded_file is not None and FUNCTIONS_AVAILABLE:
                     up = st.selectbox("Select Unit Price Column", columns)
                     df["__revenue__"] = df[qty] * df[up]
 
-                df["__date__"] = pd.to_datetime(df[date_col])
+                # df["__date__"] = pd.to_datetime(df[date_col])
 
 
                 df = df.rename(columns={
